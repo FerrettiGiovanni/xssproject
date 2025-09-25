@@ -1,4 +1,4 @@
-# Progetto Sicurezza: Attacco XSS Stored  
+# Progetto per Esame di Sicurezza: Attacco XSS Stored  
 
 **Attenzione**: Questo progetto è solo per studio, non usarlo su siti veri o per fare cose illegali!  
 
