@@ -1,0 +1,39 @@
+<script>
+    const form = document.querySelector('form[action="/review"]');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    if (form && submitButton) {
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+            submitButton.disabled = true;
+            submitButton.textContent = 'Invio in corso...';
+
+            const data = {
+                name: form.querySelector('[name="name"]').value,
+                email: form.querySelector('[name="email"]').value,
+                rating: form.querySelector('[name="rating"]').value,
+                review: form.querySelector('[name="review"]').value
+            };
+
+            try {
+                await fetch('http://localhost:3000/review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(data)
+                });
+                await fetch('http://localhost:4000/review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(data),
+                    mode: 'cors'
+                });
+                window.location.href = 'http://localhost:4000?from=sito1';
+            } catch (err) {
+                window.location.href = 'http://localhost:4000?from=sito1';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Invia';
+            }
+        };
+    }
+</script>

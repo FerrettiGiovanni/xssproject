@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Meteo Roma</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #e0f2fe, #f3e8ff);
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+    .review-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .review-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .form-input, .form-textarea {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .form-input:focus, .form-textarea:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 5px rgba(124, 58, 237, 0.5);
+      outline: none;
+    }
+    .submit-btn {
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .submit-btn:hover {
+      background-color: #6d28d9;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Intestazione -->
+    <header class="text-center mb-10">
+      <h1 class="text-4xl font-bold text-gray-800">Meteo Roma</h1>
+      <p class="text-gray-600 mt-2">Consulta il meteo e condividi la tua esperienza con la community!</p>
+    </header>
+
+    <!-- METEO ROMA -->
+    <section id="meteo-widget" class="bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 mb-10 rounded shadow">
+      <p>Caricamento previsioni meteo per Roma...</p>
+    </section>
+
+    <!-- Form per inviare una recensione -->
+    <section class="bg-white shadow-lg rounded-lg p-6 mb-10">
+      <h2 class="text-2xl font-semibold text-gray-700 mb-4">Lascia una recensione</h2>
+      <form method="POST" action="/review" class="space-y-4">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-600">Nome</label>
+          <input type="text" name="name" id="name" required
+                 class="form-input w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-purple-200">
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
+          <input type="email" name="email" id="email" required
+                 class="form-input w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-purple-200">
+        </div>
+        <div>
+          <label for="rating" class="block text-sm font-medium text-gray-600">Valutazione (1-5)</label>
+          <input type="number" name="rating" id="rating" min="1" max="5" required
+                 class="form-input w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-purple-200">
+        </div>
+        <div>
+          <label for="review" class="block text-sm font-medium text-gray-600">Recensione</label>
+          <textarea name="review" id="review" rows="4" required
+                    class="form-textarea w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-purple-200"></textarea>
+        </div>
+        <button type="submit"
+                class="submit-btn w-full bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700">
+          Invia Recensione
+        </button>
+      </form>
+    </section>
+
+    <!-- Sezione recensioni -->
+    <section>
+      <h2 class="text-2xl font-semibold text-gray-700 mb-6">Recensioni degli utenti</h2>
+      <% if (reviews && reviews.length > 0) { %>
+        <div class="space-y-6">
+          <% reviews.forEach(review => { %>
+            <div class="review-card bg-white shadow-md rounded-lg p-6">
+              <div class="flex items-center mb-3">
+                <h3 class="text-lg font-semibold text-gray-800"><%- review.name %></h3>
+                <div class="ml-4 flex">
+                  <% for (let i = 0; i < review.rating; i++) { %>
+                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.236 9.397c-.784-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.97z"/>
+                    </svg>
+                  <% } %>
+                </div>
+              </div>
+              <p class="text-gray-600"><%- review.text %></p>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p class="text-gray-600">Nessuna recensione disponibile. Sii il primo a lasciare una recensione!</p>
+      <% } %>
+    </section>
+  </div>
+
+<script>
+  function getWeatherIcon(code) {
+    if (code === 0) return '☀️'; 
+    if ([1,2,3].includes(code)) return '🌤️'; 
+    if ([45,48].includes(code)) return '🌫️'; 
+    if ([51,53,55].includes(code)) return '🌦️'; 
+    if ([61,63,65].includes(code)) return '🌧️'; 
+    if ([71,73,75].includes(code)) return '🌨️'; 
+    if ([80,81,82].includes(code)) return '🌧️'; 
+    if ([95,96,99].includes(code)) return '⛈️'; 
+    return '❓'; // sconosciuto
+  }
+
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=41.9028&longitude=12.4964&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe/Rome", {
+    signal: AbortSignal.timeout(5000)
+  })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Errore HTTP: ${res.status} ${res.statusText}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log('Dati API:', data);
+      const days = data.daily.time;
+      const tmax = data.daily.temperature_2m_max;
+      const tmin = data.daily.temperature_2m_min;
+      const codes = data.daily.weathercode;
+      let html = `<h2 class="text-xl font-bold mb-2">Meteo Roma – Prossimi 7 Giorni</h2><div class="grid grid-cols-2 gap-4">`;
+      days.forEach((d, i) => {
+        const date = new Date(d).toLocaleDateString("it-IT", { weekday:"short", day:"numeric", month:"short" });
+        const icon = getWeatherIcon(codes[i]);
+        html += `
+          <div class="bg-white p-3 rounded shadow flex items-center justify-between">
+            <div>${date}</div>
+            <div class="text-2xl">${icon}</div>
+            <div>${tmax[i].toFixed(1)}°C / ${tmin[i].toFixed(1)}°C</div>
+          </div>`;
+      });
+      html += `</div>`;
+      document.getElementById("meteo-widget").innerHTML = html;
+    })
+    .catch(err => {
+      console.error('Errore fetch:', err);
+      document.getElementById("meteo-widget").innerHTML = `<p class="text-red-600">Errore nel caricamento meteo: ${err.message}</p>`;
+    });
+</script>
+</body>
+</html>

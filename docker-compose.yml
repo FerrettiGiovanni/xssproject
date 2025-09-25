@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  sito1:
+    build:
+      context: ./sito1
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo1:27017/sito1_db
+      - PORT=3000
+    depends_on:
+      - mongo1
+    networks:
+      - sito1-network
+    volumes:
+      - ./sito1:/app
+      - /app/node_modules
+
+  mongo1:
+    image: mongo:latest
+    container_name: sito1-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo1-data:/data/db
+    networks:
+      - sito1-network
+
+  sito2:
+    build:
+      context: ./sito2
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_URI=mongodb://mongo2:27017/sito2_db
+      - PORT=4000
+    depends_on:
+      - mongo2
+    networks:
+      - sito2-network
+    volumes:
+      - ./sito2:/app
+      - /app/node_modules
+
+  mongo2:
+    image: mongo:latest
+    container_name: sito2-mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo2-data:/data/db
+    networks:
+      - sito2-network
+
+networks:
+  sito1-network:
+    driver: bridge
+  sito2-network:
+    driver: bridge
+
+volumes:
+  mongo1-data:
+  mongo2-data:
